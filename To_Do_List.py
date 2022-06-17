@@ -28,10 +28,10 @@ sg.theme('Black')  # please make your windows colorful
 
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
 layout = [[sg.Text('UPCOMING'), sg.Button('Add'),sg.Button('Edit')],
-        [],
-        [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
-        [sg.Checkbox('')]
-        ]
+[sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')]]
+
+layout += [[sg.Text(f'{i}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'), sg.Checkbox('', default=items[i][3]=='true')] for i in range(0,2)]
+        
 
 window = sg.Window('TASKS', layout, resizable=True)
 
