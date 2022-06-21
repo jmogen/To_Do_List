@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from cgitb import text
 from enum import auto
 from textwrap import fill
 import PySimpleGUI as sg
@@ -19,7 +20,7 @@ t = conn.cursor()
 t.execute("SELECT * FROM tasks")
 items = t.fetchall() 
 
-
+i = 0
 conn.commit()
 #conn.close()
 
@@ -27,10 +28,11 @@ conn.commit()
 sg.theme('Black')  # please make your windows colorful
 
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
-layout = [[sg.Text('UPCOMING'), sg.Button('Add'),sg.Button('Edit')],
-[sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')]]
+layout = [[sg.Text('UPCOMING'), sg.Button('Add'),sg.Button('TEST')],
+[sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
+[sg.Listbox(values=[f'{x[0]}: '+ f'{x[2]}   '+ f'{x[3]}' for x in items], size=(59,6))]]
 
-layout += [[sg.Text(f'{i}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'), sg.Checkbox('', default=items[i][3]=='true')] for i in range(0,2)]
+layout += [[sg.Text(f'{i+1}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'),sg.Text(f'{items[i][3]}'), sg.Checkbox('', default=items[i][3]=='true'), sg.Button('Edit', key=lambda: popup_prediction())] for i in range(0,2)]
         
 
 window = sg.Window('TASKS', layout, resizable=True)
@@ -55,6 +57,8 @@ while True:  # Event Loop
     #print(event, values)
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
+    if callable(event):
+        event()
     elif event == 'Add':
         popup_prediction()
 
