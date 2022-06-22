@@ -20,7 +20,7 @@ path_to_file = 'C:/Users/jmoge/Documents/GitHub/To-Do/items.db'
 
 class Task:
 
-    def __init__(self,title,description,due_date,status):
+    def __init__(self,title,description,due_date,status,id):
         self.title=title
         self.description=description
         self.due_date=due_date
@@ -29,10 +29,11 @@ class Task:
             self.status == True
         else:
             self.status == False
+        self.id = id
 
 
     def __repr__(self):
-        return f"Task:{self.title}, Due Date:{self.due_date}"
+        return f"{self.id} Task:{self.title}, Due Date:{self.due_date}"
 
 def startup():
     t.execute("SELECT * FROM tasks ORDER BY due_date")
@@ -44,7 +45,7 @@ def startup():
     tasks = []
     i = 0
     for x in items:
-        tasks.append([Task(x[0], x[1], x[2], x[3]), '!'])
+        tasks.append(Task(x[0], x[1], x[2], x[3], x[4]))
         i += 1
     return tasks
 tasks = startup()
@@ -106,12 +107,18 @@ def add_entry(ta, de, dd):
     return None
 
 def edit_prediction(title):
-
+    id = title[0]
+    id = int(str(id)[0:6])
+    print('TEST:', id)
+    t.execute("SELECT * FROM tasks WHERE id = ?", (id,))
+    item = t.fetchone()
+    conn.commit()
     col_layout = [[sg.Button('Save')]]
+    print('ITEM:', item)
     layout = [
-        [sg.Text("Task:       "), sg.Input(f'{ta}')],
-        [sg.Text("Description:"), sg.Multiline(f'{ta}',size=(None,5))],
-        [sg.Text("Due Date:   "), sg.Input(f'{ta}')],
+        [sg.Text("Task:       "), sg.Input(f'{item[0]}')],
+        [sg.Text("Description:"), sg.Multiline(f'{item[1]}',size=(None,5))],
+        [sg.Text("Due Date:   "), sg.Input(f'{item[2]}')],
         [sg.Column(col_layout, expand_x=True, element_justification='right')],
     ]
     window = sg.Window("Prediction", layout, use_default_focus=False, finalize=True, modal=True)
