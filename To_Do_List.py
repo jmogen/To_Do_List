@@ -47,7 +47,7 @@ tasks = startup()
 
 sg.theme('Black')  # please make your windows colorful
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
-layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit', key=lambda: edit_prediction( ))],
+layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit', key=lambda: edit_prediction(values['list'] ))],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
     [sg.Listbox(tasks, size=(59,6), key='list')]
     ]
@@ -83,13 +83,13 @@ def add_entry(ta, de, dd):
     print("success !")
     return None
 
-def edit_prediction(ta, de, dd):
+def edit_prediction(ta,):
 
     col_layout = [[sg.Button('Save')]]
     layout = [
         [sg.Text("Task:       "), sg.Input(f'{ta}')],
-        [sg.Text("Description:"), sg.Multiline(f'{de}',size=(None,5))],
-        [sg.Text("Due Date:   "), sg.Input(f'{dd}')],
+        [sg.Text("Description:"), sg.Multiline(f'{ta}',size=(None,5))],
+        [sg.Text("Due Date:   "), sg.Input(f'{ta}')],
         [sg.Column(col_layout, expand_x=True, element_justification='right')],
     ]
     window = sg.Window("Prediction", layout, use_default_focus=False, finalize=True, modal=True)
