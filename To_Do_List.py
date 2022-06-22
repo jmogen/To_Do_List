@@ -24,16 +24,33 @@ items = t.fetchall()
 conn.commit()
 #conn.close()
 
+class Task:
+
+    def __init__(self,title,description,due_date,status):
+        self.title=title
+        self.description=description
+        self.due_date=due_date
+        self.status=False
+        if status == 'true':
+            self.status == True
+        else:
+            self.status == False
+
+
+    def __repr__(self):
+        return f"Task:{self.title}, Due Date:{self.due_date}, Description:{self.description}"
+tasks = []
+for x in items:
+    tasks.append(Task(x[0], x[1], x[2], x[3]))
 
 sg.theme('Black')  # please make your windows colorful
-#window = sg.Window('TASKS',[[sg.Text("YES")]], resizable=True)
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
 layout = [[sg.Text('UPCOMING'), sg.Button('Add')],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
-    #[sg.Listbox(values=[f'{x[0]}: '+ f'{x[2]}   '+ f'{x[3]}' for x in items], size=(59,6))]
+    [sg.Listbox(tasks, size=(59,6))]
     ]
 
-layout += [[sg.Text(f'{i+1}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'),sg.Text(f'{items[i][3]}'), sg.Checkbox('', default=items[i][3]=='true'), sg.Button('Edit', key=lambda: edit_prediction(items[i][0], items[i][1], items[i][2]))] for i in range(0,len(items))]
+#layout += [[sg.Text(f'{i+1}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'),sg.Text(f'{items[i][3]}'), sg.Checkbox('', default=items[i][3]=='true'), sg.Button('Edit', key=lambda: edit_prediction(items[i][0], items[i][1], items[i][2]))] for i in range(0,len(items))]
             
 
 window = sg.Window('TASKS', layout, resizable=True)
