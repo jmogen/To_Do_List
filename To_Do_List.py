@@ -1,21 +1,23 @@
-from asyncio.windows_events import NULL
-from cgitb import text
-from enum import auto
-from textwrap import fill
 import PySimpleGUI as sg
 import sqlite3 as sql
-
+import os.path
+import random
+import math
 
 conn = sql.connect('items.db')
 
 t = conn.cursor()
+path_to_file = 'C:/Users/jmoge/Documents/GitHub/To-Do/items.db'
 
-# tasks.execute("""CREATE TABLE tasks(
+# if os.path.exists(path_to_file) == False:
+# t.execute("""CREATE TABLE tasks(
 #     title text,
 #     description text,
 #     due_date integer,
-#     status text
-# )""")
+#     status text,
+#     id integer
+#     )""")
+
 class Task:
 
     def __init__(self,title,description,due_date,status):
@@ -40,8 +42,10 @@ def startup():
     conn.commit()
     #conn.close()
     tasks = []
+    i = 0
     for x in items:
-        tasks.append(Task(x[0], x[1], x[2], x[3]))
+        tasks.append([Task(x[0], x[1], x[2], x[3]), '!'])
+        i += 1
     return tasks
 tasks = startup()
 
@@ -75,15 +79,23 @@ def add_prediction():
     window.close()
     return None
 
-def add_entry(ta, de, dd):
-    entry = [ta, de, dd]
-    t.execute("INSERT INTO tasks VALUES (?, ?, ?, 'true')", entry)
-    #items = t.fetchall() 
-    conn.commit()
-    print("success !")
+def delete_entry(title):
     return None
 
-def edit_prediction(ta,):
+def add_entry(ta, de, dd):
+    digits = [i for i in range(0, 10)]
+    id = ""
+    for i in range(6):
+        index = math.floor(random.random() * 10)
+        id += str(digits[index])
+   
+    t.execute("INSERT INTO tasks VALUES (?, ?, ?, 'true', ?)", (ta, de, dd, id))
+    #items = t.fetchall() 
+    conn.commit()
+    print("success !:", ta, de, dd, id)
+    return None
+
+def edit_prediction(title):
 
     col_layout = [[sg.Button('Save')]]
     layout = [
