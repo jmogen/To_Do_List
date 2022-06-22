@@ -82,12 +82,22 @@ def add_prediction():
 def delete_entry(title):
     return None
 
-def add_entry(ta, de, dd):
+def unique_id():
     digits = [i for i in range(0, 10)]
     id = ""
     for i in range(6):
         index = math.floor(random.random() * 10)
         id += str(digits[index])
+    return id
+
+def add_entry(ta, de, dd):
+    id = unique_id()
+    search = t.execute("SELECT id FROM tasks WHERE id = ?", (id,))
+    print (search)
+    while search == id:
+        id = unique_id()
+        search = t.execute("SELECT id FROM tasks WHERE id id ?", (id,))
+        
    
     t.execute("INSERT INTO tasks VALUES (?, ?, ?, 'true', ?)", (ta, de, dd, id))
     #items = t.fetchall() 
