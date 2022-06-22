@@ -16,14 +16,6 @@ t = conn.cursor()
 #     due_date integer,
 #     status text
 # )""")
-
-t.execute("SELECT * FROM tasks ORDER BY due_date")
-#t.execute("INSERT INTO tasks VALUES ('Unique Task', 'Unique Text For Filler', '3', 'true')")
-items = t.fetchall()
-
-conn.commit()
-#conn.close()
-
 class Task:
 
     def __init__(self,title,description,due_date,status):
@@ -38,16 +30,26 @@ class Task:
 
 
     def __repr__(self):
-        return f"Task:{self.title}, Due Date:{self.due_date}, Description:{self.description}"
-tasks = []
-for x in items:
-    tasks.append(Task(x[0], x[1], x[2], x[3]))
+        return f"Task:{self.title}, Due Date:{self.due_date}"
+
+def startup():
+    t.execute("SELECT * FROM tasks ORDER BY due_date")
+    #t.execute("INSERT INTO tasks VALUES ('Unique Task', 'Unique Text For Filler', '3', 'true')")
+    items = t.fetchall()
+
+    conn.commit()
+    #conn.close()
+    tasks = []
+    for x in items:
+        tasks.append(Task(x[0], x[1], x[2], x[3]))
+    return tasks
+tasks = startup()
 
 sg.theme('Black')  # please make your windows colorful
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
-layout = [[sg.Text('UPCOMING'), sg.Button('Add')],
+layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit', key=lambda: edit_prediction( ))],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
-    [sg.Listbox(tasks, size=(59,6))]
+    [sg.Listbox(tasks, size=(59,6), key='list')]
     ]
 
 #layout += [[sg.Text(f'{i+1}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'),sg.Text(f'{items[i][3]}'), sg.Checkbox('', default=items[i][3]=='true'), sg.Button('Edit', key=lambda: edit_prediction(items[i][0], items[i][1], items[i][2]))] for i in range(0,len(items))]
@@ -108,6 +110,7 @@ while True:  # Event Loop
         event()
     elif event == 'Add':
         add_prediction()
+    window['list'].update(startup()) #update listbox entries
   
 
 window.close()
