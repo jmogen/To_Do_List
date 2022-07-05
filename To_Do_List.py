@@ -1,3 +1,4 @@
+from genericpath import exists
 import PySimpleGUI as sg
 import sqlite3 as sql
 import os.path
@@ -52,7 +53,7 @@ tasks = startup()
 
 sg.theme('Black')  # please make your windows colorful
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
-layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit', key=lambda: edit_prediction(values['list'] ))],
+layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit')],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
     [sg.Listbox(tasks, size=(59,6), key='list')]
     ]
@@ -97,7 +98,7 @@ def add_entry(ta, de, dd):
     print (search)
     while search == id:
         id = unique_id()
-        search = t.execute("SELECT id FROM tasks WHERE id id ?", (id,))
+        search = t.execute("SELECT id FROM tasks WHERE id = ?", (id,))
         
    
     t.execute("INSERT INTO tasks VALUES (?, ?, ?, 'true', ?)", (ta, de, dd, id))
@@ -105,6 +106,10 @@ def add_entry(ta, de, dd):
     conn.commit()
     print("success !:", ta, de, dd, id)
     return None
+
+def update_entry(ta, de, dd, id):
+    t.execute("UPDATE tasks SET title = ?, description = ?, due_date = ? WHERE id = ?", (ta, de, dd, id,))
+    conn.commit()
 
 def edit_prediction(title):
     id = title[0]
@@ -124,6 +129,8 @@ def edit_prediction(title):
     window = sg.Window("Prediction", layout, use_default_focus=False, finalize=True, modal=True)
     #block_focus(window)
     event, values = window.read()
+    if event == 'Save':
+        update_entry(values[0], values[1], values[2], id)
     window.close()
     return None
 
@@ -135,8 +142,11 @@ while True:  # Event Loop
     print(event, values)
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
-    if callable(event):
-        event()
+    if event == 'Edit' and values['list']:
+        print(values['list'])
+        edit_prediction(values['list'])
+    # if callable(event):
+    #     event()
     elif event == 'Add':
         add_prediction()
     window['list'].update(startup()) #update listbox entries
