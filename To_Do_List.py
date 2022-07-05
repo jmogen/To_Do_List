@@ -10,6 +10,7 @@ conn = sql.connect('items.db')
 t = conn.cursor()
 path_to_file = 'C:/Users/jmoge/Documents/GitHub/To-Do/items.db'
 
+# create sql table if file does not already exist
 # if os.path.exists(path_to_file) == False:
 # t.execute("""CREATE TABLE tasks(
 #     title text,
@@ -19,6 +20,7 @@ path_to_file = 'C:/Users/jmoge/Documents/GitHub/To-Do/items.db'
 #     id integer
 #     )""")
 
+# format sql table data for display
 class Task:
 
     def __init__(self,title,description,due_date,status,id):
@@ -36,6 +38,7 @@ class Task:
     def __repr__(self):
         return f"{self.id} Task:{self.title}, Due Date:{self.due_date}"
 
+# startup function to format data for display
 def startup():
     t.execute("SELECT * FROM tasks ORDER BY due_date")
     #t.execute("INSERT INTO tasks VALUES ('Unique Task', 'Unique Text For Filler', '3', 'true')")
@@ -56,14 +59,11 @@ col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
 layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit')],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
     [sg.Listbox(tasks, size=(59,6), key='list')]
-    ]
-
-#layout += [[sg.Text(f'{i+1}. '), sg.Text(f'{items[i][0]}'), sg.Text(f'{items[i][2]}'),sg.Text(f'{items[i][3]}'), sg.Checkbox('', default=items[i][3]=='true'), sg.Button('Edit', key=lambda: edit_prediction(items[i][0], items[i][1], items[i][2]))] for i in range(0,len(items))]
-            
+    ]           
 
 window = sg.Window('TASKS', layout, resizable=True)
 
-
+# popup logic for adding another entry
 def add_prediction():
 
     col_layout = [[sg.Button('Save',key=lambda: add_entry(values[0], values[1], values[2] ))]]
@@ -81,9 +81,11 @@ def add_prediction():
     window.close()
     return None
 
+# delete entry (placeholder for now)
 def delete_entry(title):
     return None
 
+# generate unique task id
 def unique_id():
     digits = [i for i in range(0, 10)]
     id = ""
@@ -92,6 +94,7 @@ def unique_id():
         id += str(digits[index])
     return id
 
+# add entry 
 def add_entry(ta, de, dd):
     id = unique_id()
     search = t.execute("SELECT id FROM tasks WHERE id = ?", (id,))
@@ -107,10 +110,12 @@ def add_entry(ta, de, dd):
     print("success !:", ta, de, dd, id)
     return None
 
+# update entry data
 def update_entry(ta, de, dd, id):
     t.execute("UPDATE tasks SET title = ?, description = ?, due_date = ? WHERE id = ?", (ta, de, dd, id,))
     conn.commit()
 
+# popup logic for an edit of a task
 def edit_prediction(title):
     id = title[0]
     id = int(str(id)[0:6])
@@ -135,21 +140,19 @@ def edit_prediction(title):
     return None
 
 
-
-while True:  # Event Loop
-    #update_window()
+# Event Loop
+while True:  
     event, values = window.read()
     print(event, values)
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
     if event == 'Edit' and values['list']:
-        print(values['list'])
         edit_prediction(values['list'])
     # if callable(event):
     #     event()
     elif event == 'Add':
         add_prediction()
-    window['list'].update(startup()) #update listbox entries
+    window['list'].update(startup()) #update listbox entries while window is active
   
 
 window.close()
