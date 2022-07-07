@@ -56,7 +56,7 @@ tasks = startup()
 
 sg.theme('Black')  # please make your windows colorful
 col_actions = [[sg.Text('Due Date'),sg.Text('Status') ]]
-layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit')],
+layout = [[sg.Text('UPCOMING'), sg.Button('Add'), sg.Button('Edit'), sg.Button('Delete')],
     [sg.Text('TASKS'), sg.Column(col_actions, element_justification='right')],
     [sg.Listbox(tasks, size=(59,6), key='list')]
     ]           
@@ -83,6 +83,10 @@ def add_prediction():
 
 # delete entry (placeholder for now)
 def delete_entry(title):
+    id = title[0]
+    id = int(str(id)[0:6])
+    t.execute("DELETE FROM tasks WHERE id = ?", (id,))
+    conn.commit()
     return None
 
 # generate unique task id
@@ -148,6 +152,8 @@ while True:
         break
     if event == 'Edit' and values['list']:
         edit_prediction(values['list'])
+    if event == 'Delete' and values['list']:
+        delete_entry(values['list'])    
     # if callable(event):
     #     event()
     elif event == 'Add':
